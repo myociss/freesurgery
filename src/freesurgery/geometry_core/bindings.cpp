@@ -5,6 +5,6 @@ namespace py = pybind11;
 
 PYBIND11_PlUGIN(geometry_core) {
     py::module m("geometry_core");
-    m.def("mesh_image", &mesh);
+    m.def("mesh_image", &mesh_image);
     return m.ptr();
 }

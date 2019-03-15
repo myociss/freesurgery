@@ -1,1 +1,1 @@
-void mesh(const char* fname);
+void mesh_image(const char* fname);

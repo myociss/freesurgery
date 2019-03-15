@@ -24,7 +24,7 @@ typedef CGAL::Mesh_criteria_3<Tr> Mesh_criteria;
 // To avoid verbose function and named parameters call
 using namespace CGAL::parameters;
 
-void mesh(const char* fname)
+void mesh_image(const char* fname)
 {
   /// [Loads image]
   //const char* fname = (argc>1)?argv[1]:"data/liver.inr.gz";

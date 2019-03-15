@@ -1,5 +1,6 @@
 import nibabel, tempfile, os, numpy as np, sys
 from ctypes import c_char, sizeof, c_wchar_p, create_string_buffer
+from geometry_core import geometry_core
 
 def nii2mesh(file):
     stack = nibabel.load(file)
