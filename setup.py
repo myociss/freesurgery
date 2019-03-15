@@ -80,7 +80,8 @@ setup(
     entry_points = {
         'console_scripts': ['freesurgery=freesurgery.command_line:main'],
     },
-    ext_modules=[CMakeExtension('freesurgery/freesurgery')],
+    ext_modules=[CMakeExtension('freesurgery')],
     # add custom build_ext command
     cmdclass=dict(build_ext=CMakeBuild),
+    zip_safe=False,
 )
