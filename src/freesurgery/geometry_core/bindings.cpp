@@ -1,5 +1,5 @@
 #include <pybind11/pybind11.h>
-#include "cgal_mesh_image.hpp"
+#include "mesh_utils/cgal_mesh_image.hpp"
 
 namespace py = pybind11;
 
