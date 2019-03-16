@@ -1,7 +1,9 @@
-from freesurgery.gui import app
+#from freesurgery.gui import app
+import geometry_core
 
 def main():
-    app()
+    #app()
+   
 
 if __name__=='__main__':
     main()
