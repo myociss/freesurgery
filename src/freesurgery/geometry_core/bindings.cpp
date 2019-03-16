@@ -1,11 +1,11 @@
 #include <pybind11/pybind11.h>
-#include "mesh_utils.hpp"
+#include "math.hpp"
 
 namespace py = pybind11;
 
-PYBIND11_PLUGIN(geometry_core)
+PYBIND11_PLUGIN(freesurgery)
 {
-    py::module m("geometry_core");
-    m.def("mesh_nii", &mesh_nii);
+    py::module m("freesurgery");
+    m.def("add", &add);
     return m.ptr();
 }

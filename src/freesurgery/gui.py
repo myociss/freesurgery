@@ -1,6 +1,6 @@
 import sys
 #from PyQt5.QtWidgets import QApplication, QWidget
-'''
+
 from PyQt5.QtWidgets import QMainWindow, QDesktopWidget, QAction, qApp, QApplication
 from PyQt5.QtGui import QIcon
 
@@ -36,4 +36,3 @@ def app():
     application = AppWindow()
     application.show()
     sys.exit(app.exec())
-'''
