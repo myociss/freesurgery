@@ -1,0 +1,34 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/fern/freesurgery/src/freesurgery/geometry_core/bindings.cpp
+pybind11/pybind11.h
+-
+mesh_utils.hpp
+/home/fern/freesurgery/src/freesurgery/geometry_core/mesh_utils.hpp
+
+/home/fern/freesurgery/src/freesurgery/geometry_core/mesh_utils.cpp
+mesh_utils.hpp
+/home/fern/freesurgery/src/freesurgery/geometry_core/mesh_utils.hpp
+CGAL/Exact_predicates_inexact_constructions_kernel.h
+-
+CGAL/Mesh_triangulation_3.h
+-
+CGAL/Mesh_complex_3_in_triangulation_3.h
+-
+CGAL/Mesh_criteria_3.h
+-
+CGAL/Labeled_mesh_domain_3.h
+-
+CGAL/make_mesh_3.h
+-
+CGAL/Image_3.h
+-
+
+/home/fern/freesurgery/src/freesurgery/geometry_core/mesh_utils.hpp
+

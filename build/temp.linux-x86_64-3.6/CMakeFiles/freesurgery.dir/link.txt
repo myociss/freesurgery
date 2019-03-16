@@ -1,0 +1,1 @@
+/usr/bin/c++ -fPIC -DVERSION_INFO=\"0.1\" -O3 -DNDEBUG  -shared  -o ../../src/freesurgery.cpython-36m-x86_64-linux-gnu.so CMakeFiles/freesurgery.dir/src/freesurgery/bindings.cpp.o 

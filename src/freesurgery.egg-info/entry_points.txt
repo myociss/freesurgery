@@ -1,0 +1,3 @@
+[console_scripts]
+freesurgery = freesurgery.command_line:main
+

@@ -1,0 +1,14 @@
+README.md
+setup.py
+src/freesurgery/__init__.py
+src/freesurgery/command_line.py
+src/freesurgery/gui.py
+src/freesurgery/nii2mesh.py
+src/freesurgery.egg-info/PKG-INFO
+src/freesurgery.egg-info/SOURCES.txt
+src/freesurgery.egg-info/dependency_links.txt
+src/freesurgery.egg-info/entry_points.txt
+src/freesurgery.egg-info/not-zip-safe
+src/freesurgery.egg-info/requires.txt
+src/freesurgery.egg-info/top_level.txt
+src/freesurgery/geometry_core/__init__.py
