@@ -9,6 +9,8 @@ setup(name='freesurgery',
       license='MIT',
       packages=['freesurgery'],
       install_requires=[
+          'numpy',
+          'meshio',
           'nii2mesh',
       ],
       entry_points={
