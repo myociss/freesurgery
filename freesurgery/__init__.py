@@ -1,1 +1,1 @@
-from .main import check_parcellation, mri2mesh3d
+from .main import check_parcellation, mri2mesh3d, view_brain_mesh

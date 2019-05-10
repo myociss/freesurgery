@@ -10,6 +10,7 @@ setup(name='freesurgery',
       packages=['freesurgery'],
       install_requires=[
           'numpy',
+          'flask',
           'meshio',
           'nii2mesh',
       ],
@@ -17,6 +18,8 @@ setup(name='freesurgery',
           'console_scripts':[
 'freesurgery_check_parcellation=freesurgery.command_line:check_parcellation',
 'freesurgery_mri2mesh3d=freesurgery.command_line:mri2mesh3d',
+'freesurgery_view_brain_mesh=freesurgery.command_line:view_brain_mesh',
           ],
       },
+      include_package_data=True,
       zip_safe=False)
