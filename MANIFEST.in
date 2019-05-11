@@ -1,1 +1,3 @@
-include freesurgery/web/*
+include freesurgery/templates/*
+include freesurgery/static/*
+include freesurgery/static/js/*
