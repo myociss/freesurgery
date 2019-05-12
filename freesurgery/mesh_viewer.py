@@ -13,7 +13,6 @@ def send_js(path):
 
 @app.route('/')
 def mesh_view():
-    path = os.path.dirname(os.path.realpath(__file__))
     return render_template('index.html')
 
 @app.route('/getMesh')
@@ -28,29 +27,25 @@ def view_brain_mesh(mesh_file, color_map_file=None, paths_file=None):
     with open(mesh_file, 'r') as f:
         json_mesh = json.load(f)
 
-    mesh=pathfinder.Mesh(num_vertices=len(json_mesh['vertices']), num_faces=len(json_mesh['faces']), num_tetrahedrons=len(json_mesh['tetrahedrons']))
+    #mesh=load_pathfinder_mesh(json_mesh)
 
-    mesh.set_vertices(json_mesh['vertices'])
+    #max_x = max(map(lambda vertex: vertex[0], json_mesh['vertices']))
+    #min_x = min(map(lambda vertex: vertex[0], json_mesh['vertices']))
+    #x_mid = (max_x - min_x) / 2
 
-    for idx, tet in enumerate(json_mesh['tetrahedrons']):
-        mesh.add_tetrahedron(tetrahedron_id=idx, neighbor_ids=tet['neighbors'], vertex_ids=tet['vertices'], weight=tet['weight'])
+    #max_y = max(map(lambda vertex: vertex[1], json_mesh['vertices']))
+    #min_y = min(map(lambda vertex: vertex[1], json_mesh['vertices']))
+    #y_mid = (max_y - min_y) / 2
 
-    for face in json_mesh['faces']:
-        mesh.add_face(vertex_ids=face['vertices'], tetrahedron_id=face['tetrahedron'])
+    #max_z = max(map(lambda vertex: vertex[2], json_mesh['vertices']))
+    #min_z = min(map(lambda vertex: vertex[2], json_mesh['vertices']))
+    #z_mid = (max_z - min_z) / 2
+    
+    vertex_mins = [min(map(lambda vertex: vertex[i], json_mesh['vertices'])) for i in range(3)]
+    vertex_maxs = [max(map(lambda vertex: vertex[i], json_mesh['vertices'])) for i in range(3)]
+    vertex_mids = [(vertex_maxs[i] - vertex_mins[i]) / 2 for i in range(3)]
 
-    max_x = max(map(lambda vertex: vertex[0], json_mesh['vertices']))
-    min_x = min(map(lambda vertex: vertex[0], json_mesh['vertices']))
-    x_mid = (max_x - min_x) / 2
-
-    max_y = max(map(lambda vertex: vertex[1], json_mesh['vertices']))
-    min_y = min(map(lambda vertex: vertex[1], json_mesh['vertices']))
-    y_mid = (max_y - min_y) / 2
-
-    max_z = max(map(lambda vertex: vertex[2], json_mesh['vertices']))
-    min_z = min(map(lambda vertex: vertex[2], json_mesh['vertices']))
-    z_mid = (max_z - min_z) / 2
-
-    app.config['vertices'] = [[v[0] - x_mid, v[1] - y_mid, v[2] - z_mid] for v in json_mesh['vertices']]
+    app.config['vertices'] = [[v[i] - vertex_mids[i] for i in range(3)] for v in json_mesh['vertices']]
 
     if color_map_file:
         color_map = color_map_file
@@ -66,6 +61,18 @@ def view_brain_mesh(mesh_file, color_map_file=None, paths_file=None):
 
     os.environ['FLASK_ENV'] = 'development'
     app.run()
+
+def load_pathfinder_mesh(json_mesh):
+    mesh=pathfinder.Mesh(num_vertices=len(json_mesh['vertices']), num_faces=len(json_mesh['faces']), num_tetrahedrons=len(json_mesh['tetrahedrons']))
+
+    mesh.set_vertices(json_mesh['vertices'])
+
+    for idx, tet in enumerate(json_mesh['tetrahedrons']):
+        mesh.add_tetrahedron(tetrahedron_id=idx, neighbor_ids=tet['neighbors'], vertex_ids=tet['vertices'], weight=tet['weight'])
+
+    for face in json_mesh['faces']:
+        mesh.add_face(vertex_ids=face['vertices'], tetrahedron_id=face['tetrahedron'])
+    return mesh
 
     #if paths_file:
      #   print('this happens')

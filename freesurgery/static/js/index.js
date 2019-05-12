@@ -40,9 +40,26 @@ $(document).ready(function(){
     }
     
     function initMesh(){
+        geometry = new THREE.Geometry();
         $.get('/getMesh', function(res){
-            //var data = JSON.parse(res);
-            //console.log(res);
+            $.each(res.vertices, function(i, e){
+                var vertex = new THREE.Vector3(e[0], e[1], e[2]);
+                geometry.vertices.push(vertex);
+            });
+
+            $.each(res.faces, function(i, e){
+                var face = new THREE.Face3(e.vertices[0], e.vertices[1], e.vertices[2]);
+                face.color.setHex(res.color_labels[e.label]);
+                geometry.faces.push(face);
+            });
+
+            var material = new THREE.MeshBasicMaterial( {
+                vertexColors: THREE.FaceColors,
+                side: THREE.DoubleSide} );
+
+            mesh = new THREE.Mesh(geometry, material);
+            scene.add(mesh);
+            render();
         });
     }
 
