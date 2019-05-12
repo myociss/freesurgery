@@ -25,7 +25,7 @@ $(document).ready(function(){
     
         scene = new THREE.Scene();
     
-        scene.background = new THREE.Color( 0x3e3e3f );
+        scene.background = new THREE.Color( 0xf0f0f0 );
         var light = new THREE.DirectionalLight( 0xefefff, 1.5 );
         light.position.set( 1, 1, 1 ).normalize();
         scene.add( light );
