@@ -8,7 +8,7 @@ $(document).ready(function(){
     var cameraZ = 0;
     
     initScene();
-    $("#loading").modal({
+    $('#loading').modal({
         backdrop: "static",
         keyboard: false,
         show: true
@@ -69,11 +69,7 @@ $(document).ready(function(){
 
             mesh = new THREE.Mesh(geometry, material);
             scene.add(mesh);
-            $("#loading").modal({
-                backdrop: "static",
-                keyboard: false,
-                show: false
-            });
+            $('#loading').modal('hide');
             render();
         });
     }
