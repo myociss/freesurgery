@@ -1,5 +1,6 @@
 //alert('here');
 $(document).ready(function(){
+
     var camera, scene, renderer, controls, geometry, material, mesh, localPlane;
 
     var cameraX = -400;
@@ -7,6 +8,11 @@ $(document).ready(function(){
     var cameraZ = 0;
     
     initScene();
+    $("#loading").modal({
+        backdrop: "static",
+        keyboard: false,
+        show: true
+    });
     initMesh();
     
     function initScene() {
@@ -19,7 +25,7 @@ $(document).ready(function(){
     
         scene = new THREE.Scene();
     
-        scene.background = new THREE.Color( 0xf0f0f0 );
+        scene.background = new THREE.Color( 0x3e3e3f );
         var light = new THREE.DirectionalLight( 0xefefff, 1.5 );
         light.position.set( 1, 1, 1 ).normalize();
         scene.add( light );
@@ -63,6 +69,11 @@ $(document).ready(function(){
 
             mesh = new THREE.Mesh(geometry, material);
             scene.add(mesh);
+            $("#loading").modal({
+                backdrop: "static",
+                keyboard: false,
+                show: false
+            });
             render();
         });
     }
