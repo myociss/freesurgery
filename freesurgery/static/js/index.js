@@ -42,6 +42,7 @@ $(document).ready(function(){
     function initMesh(){
         geometry = new THREE.Geometry();
         $.get('/getMesh', function(res){
+	    console.log(res)
             $.each(res.vertices, function(i, e){
                 var vertex = new THREE.Vector3(e[0], e[1], e[2]);
                 geometry.vertices.push(vertex);
@@ -49,11 +50,17 @@ $(document).ready(function(){
 
             $.each(res.faces, function(i, e){
                 var face = new THREE.Face3(e.vertices[0], e.vertices[1], e.vertices[2]);
-                face.color.setHex(res.color_labels[e.label]);
+		//console.log(res.color_map[e.label]);
+                //face.color.setHex(parseInt(res.color_map[e.label], 16));
+		//face.color.setHex(0x00ffff);
+		face.color.set(res.color_map[e.label]);
                 geometry.faces.push(face);
             });
+	    geometry.computeFaceNormals();
+	    //geometry.colorsNeedUpdate = true;
 
-            var material = new THREE.MeshBasicMaterial( {
+            var material = new THREE.MeshPhongMaterial( {
+		color: 0xffffff,
                 vertexColors: THREE.FaceColors,
                 side: THREE.DoubleSide} );
 
