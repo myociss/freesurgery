@@ -11,4 +11,4 @@ def mesh2json():
     freesurgery.mesh2json(argv[1])
 
 def view_brain_mesh():
-    freesurgery.view_brain_mesh('')
+    freesurgery.view_brain_mesh(argv[1])

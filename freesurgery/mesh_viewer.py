@@ -1,10 +1,11 @@
-import os
+import os, json, pathfinder, random
 
 from flask import Flask
-from flask import render_template, send_from_directory
+from flask import render_template, send_from_directory, jsonify
 
 app = Flask('freesurgery')
-mesh = None
+#json_mesh = None
+#mesh = None
 
 @app.route('/static/js/<path:path>')
 def send_js(path):
@@ -15,10 +16,18 @@ def mesh_view():
     path = os.path.dirname(os.path.realpath(__file__))
     return render_template('index.html')
 
-def view_brain_mesh(json_file, paths_file=None):
-    '''
-    with open(json_file, 'r') as f:
-        json_mesh = json.load(mesh_file)
+@app.route('/getMesh')
+def send_mesh():
+    return jsonify({'vertices': app.config['vertices'], 'faces': app.config['faces'], 'color_map': app.config['color_map']})
+
+#def get_json_mesh():
+#    return json_mesh
+
+def view_brain_mesh(mesh_file, color_map_file=None, paths_file=None):
+    print('reading mesh file...')
+    with open(mesh_file, 'r') as f:
+        json_mesh = json.load(f)
+
     mesh=pathfinder.Mesh(num_vertices=len(json_mesh['vertices']), num_faces=len(json_mesh['faces']), num_tetrahedrons=len(json_mesh['tetrahedrons']))
 
     mesh.set_vertices(json_mesh['vertices'])
@@ -26,9 +35,34 @@ def view_brain_mesh(json_file, paths_file=None):
     for idx, tet in enumerate(json_mesh['tetrahedrons']):
         mesh.add_tetrahedron(tetrahedron_id=idx, neighbor_ids=tet['neighbors'], vertex_ids=tet['vertices'], weight=tet['weight'])
 
-    for face in self.test_mesh['faces']:
+    for face in json_mesh['faces']:
         mesh.add_face(vertex_ids=face['vertices'], tetrahedron_id=face['tetrahedron'])
-    '''
+
+    max_x = max(map(lambda vertex: vertex[0], json_mesh['vertices']))
+    min_x = min(map(lambda vertex: vertex[0], json_mesh['vertices']))
+    x_mid = (max_x - min_x) / 2
+
+    max_y = max(map(lambda vertex: vertex[1], json_mesh['vertices']))
+    min_y = min(map(lambda vertex: vertex[1], json_mesh['vertices']))
+    y_mid = (max_y - min_y) / 2
+
+    max_z = max(map(lambda vertex: vertex[2], json_mesh['vertices']))
+    min_z = min(map(lambda vertex: vertex[2], json_mesh['vertices']))
+    z_mid = (max_z - min_z) / 2
+
+    app.config['vertices'] = [[v[0] - x_mid, v[1] - y_mid, v[2] - z_mid] for v in json_mesh['vertices']]
+
+    if color_map_file:
+        color_map = color_map_file
+    else:
+        labels = [tet['label'] for tet in json_mesh['tetrahedrons']]
+        num_labels = max(labels)
+        color_map = []
+        r = lambda: random.randint(0, 255)
+        for i in range(num_labels):
+            color_map.append('#%02X%02X%02X' % (r(),r(),r()))
+    app.config['color_map'] = color_map
+    app.config['faces'] = json_mesh['faces']
 
     os.environ['FLASK_ENV'] = 'development'
     app.run()

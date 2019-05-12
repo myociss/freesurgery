@@ -1,3 +1,4 @@
 include freesurgery/templates/*
 include freesurgery/static/*
 include freesurgery/static/js/*
+include freesurgery/static/js/plugins/*

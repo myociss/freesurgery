@@ -30,7 +30,7 @@ def mesh2json(mesh_file):
     print('converting tetrahedrons to json...')
     for idx, tet in enumerate(tets):
         tet = [v.item() for v in tet]
-        tets_json.append({'vertices': tet, 'neighbors':[], 'weight':random.random()})#, 'label': tet_labels[idx]})
+        tets_json.append({'vertices': tet, 'neighbors':[], 'weight':random.random(), 'label': tet_labels[idx]})
 
         for i in range(4):
             face = [tet[j] for j in range(4) if j != i]

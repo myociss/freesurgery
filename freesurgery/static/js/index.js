@@ -41,8 +41,12 @@ $(document).ready(function(){
     
     function initMesh(){
         $.get('/getMesh', function(res){
-            var data = JSON.parse(res);
-            console.log(res);
+            //var data = JSON.parse(res);
+            //console.log(res);
         });
+    }
+
+    function render(){
+	renderer.render(scene, camera);
     }
 });
