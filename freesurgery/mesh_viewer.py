@@ -11,6 +11,10 @@ app = Flask('freesurgery')
 def send_js(path):
     return send_from_directory('static/js', path)
 
+@app.route('/static/css/<path:path>')
+def send_css(path):
+    return send_from_directory('static/css', path)
+
 @app.route('/')
 def mesh_view():
     return render_template('index.html')
@@ -19,8 +23,6 @@ def mesh_view():
 def send_mesh():
     return jsonify({'vertices': app.config['vertices'], 'faces': app.config['faces'], 'color_map': app.config['color_map']})
 
-#def get_json_mesh():
-#    return json_mesh
 
 def view_brain_mesh(mesh_file, color_map_file=None, paths_file=None):
     print('reading mesh file...')
