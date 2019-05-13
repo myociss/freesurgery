@@ -49,6 +49,9 @@ def view_brain_mesh(mesh_file, color_map_file=None, paths_file=None):
     app.config['color_map'] = color_map
     app.config['faces'] = json_mesh['faces']
 
+    # this should not be hardcoded but read in from file
+    app.config['plane_ids'] = [i for i in range(8)]
+
     os.environ['FLASK_ENV'] = 'development'
     app.run()
 

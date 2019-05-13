@@ -48,7 +48,6 @@ $(document).ready(function(){
     function initMesh(){
         var brainGeometry = new THREE.Geometry();
         $.get('/getMesh', function(res){
-	    console.log(res)
             $.each(res.vertices, function(i, e){
                 var vertex = new THREE.Vector3(e[0], e[1], e[2]);
                 brainGeometry.vertices.push(vertex);

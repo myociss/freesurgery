@@ -10,7 +10,19 @@
     <script src="static/js/plugins/OrbitControls.js"></script>
     <script src="static/js/plugins/bootstrap.min.js"></script>
     <script src="static/js/index.js"></script>
-    <h1>here</h1>
+    <div class="select">
+        <select id="alpha">
+            {% for id in config['plane_ids'] %}
+                <option value="{{id}}">{{ id }}</option>
+            {% endfor %}
+        </select>
+        <select id="theta">
+            {% for id in config['plane_ids'] %}
+                <option value="{{id}}">{{ id }}</option>
+            {% endfor %}
+        </select>
+        <button class="plane-bttn">Get Plane</button>
+    </div>
     <div class="modal fade" id="loading" tabindex="-1" role="dialog" aria-labelledby="loadingLabel">
       <div class="modal-dialog modal-sm" role="document">
           <div class="modal-content">
