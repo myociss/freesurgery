@@ -1,7 +1,7 @@
-import os, json, pathfinder, random
+import os, json, pathfinder, random, math
 
 from flask import Flask
-from flask import render_template, send_from_directory, jsonify
+from flask import render_template, send_from_directory, jsonify, request
 
 app = Flask('freesurgery')
 #json_mesh = None
@@ -23,13 +23,19 @@ def mesh_view():
 def send_mesh():
     return jsonify({'vertices': app.config['vertices'], 'faces': app.config['faces'], 'color_map': app.config['color_map']})
 
+@app.route('/getPlane')
+def send_plane():
+    alpha = int(request.args.get('alpha'))
+    theta = int(request.args.get('theta'))
+    rotation = [math.pi * alpha / len(app.config['plane_ids']), math.pi * theta / len(app.config['plane_ids'])]
+
+    plane_intersection=app.config['mesh'].slice(rotation=rotation)
+    return jsonify([{'vertices': shape.vertices(), 'color_label': app.config['color_map'][shape.label()]} for shape in plane_intersection])
 
 def view_brain_mesh(mesh_file, color_map_file=None, paths_file=None):
     print('reading mesh file...')
     with open(mesh_file, 'r') as f:
         json_mesh = json.load(f)
-
-    #mesh=load_pathfinder_mesh(json_mesh)
     
     vertex_mins = [min(map(lambda vertex: vertex[i], json_mesh['vertices'])) for i in range(3)]
     vertex_maxs = [max(map(lambda vertex: vertex[i], json_mesh['vertices'])) for i in range(3)]
@@ -48,6 +54,8 @@ def view_brain_mesh(mesh_file, color_map_file=None, paths_file=None):
             color_map.append('#%02X%02X%02X' % (r(),r(),r()))
     app.config['color_map'] = color_map
     app.config['faces'] = json_mesh['faces']
+    app.config['mesh']=load_pathfinder_mesh(json_mesh)
+    app.config['mesh'].set_target([100, 100, 150])
 
     # this should not be hardcoded but read in from file
     app.config['plane_ids'] = [i for i in range(8)]
@@ -61,13 +69,9 @@ def load_pathfinder_mesh(json_mesh):
     mesh.set_vertices(json_mesh['vertices'])
 
     for idx, tet in enumerate(json_mesh['tetrahedrons']):
-        mesh.add_tetrahedron(tetrahedron_id=idx, neighbor_ids=tet['neighbors'], vertex_ids=tet['vertices'], weight=tet['weight'])
+        mesh.add_tetrahedron(tetrahedron_id=idx, neighbor_ids=tet['neighbors'], vertex_ids=tet['vertices'], weight=tet['weight'], label=tet['label'])
 
     for face in json_mesh['faces']:
         mesh.add_face(vertex_ids=face['vertices'], tetrahedron_id=face['tetrahedron'])
     return mesh
 
-    #if paths_file:
-     #   print('this happens')
-        # execute find path code
-    #else:
