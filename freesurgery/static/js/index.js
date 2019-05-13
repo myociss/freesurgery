@@ -89,6 +89,7 @@ $(document).ready(function(){
             cuttingPlane = new THREE.Geometry();
             var counter = 0;
             $.each(res.shapes, function(i, e){
+		console.log(e.color_label);
                 var shape_vertices = e.vertices;
                 var v0 = shape_vertices[0];
                 var v1 = shape_vertices[1];
@@ -98,7 +99,7 @@ $(document).ready(function(){
                 cuttingPlane.vertices.push(new THREE.Vector3(v1[0], v1[1], v1[2]));
                 cuttingPlane.vertices.push(new THREE.Vector3(v2[0], v2[1], v2[2]));
 
-                var face = new THREE.Face3(counter, counter + 1, counter + 2);
+                var face = new THREE.Face3(counter, counter+1, counter+2);
                 face.color.set(e.color_label);
                 cuttingPlane.faces.push(face);
 
@@ -110,7 +111,7 @@ $(document).ready(function(){
                     cuttingPlane.vertices.push(new THREE.Vector3(v3[0], v3[1], v3[2]));
                     cuttingPlane.vertices.push(new THREE.Vector3(v2[0], v2[1], v2[2]));
 
-                    var face = new THREE.Face3(counter, counter + 1, counter + 2);
+                    var face = new THREE.Face3(counter, counter+1, counter+2);
                     face.color.set(e.color_label);
                     cuttingPlane.faces.push(face);
 
@@ -118,6 +119,7 @@ $(document).ready(function(){
                 }
 
             });
+	    cuttingPlane.computeFaceNormals();
             var planeMaterial = new THREE.MeshPhongMaterial( {
 		        color: 0xffffff,
                 vertexColors: THREE.FaceColors,
@@ -126,7 +128,7 @@ $(document).ready(function(){
             var crossSection = new THREE.Mesh( cuttingPlane, planeMaterial );
             crossSection.name = 'currentPlane';
             scene.add( crossSection );
-		    render();
+	    render();
         });
 
     });
