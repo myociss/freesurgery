@@ -74,6 +74,17 @@ $(document).ready(function(){
     }
 
     function render(){
-	renderer.render(scene, camera);
+	    renderer.render(scene, camera);
     }
+
+    $('body').on('click', '.plane-bttn', function(){
+        var alpha = $('#alpha').val();
+        var theta = $('#theta').val();
+    
+        $.get('/getPlane', {alpha: alpha, theta: theta}, function(res){
+                console.log(res);
+        });
+
+    });
+
 });
