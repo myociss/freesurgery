@@ -61,7 +61,7 @@ $(document).ready(function(){
 	    brainGeometry.computeFaceNormals();
 	    geometry = new THREE.BufferGeometry().fromGeometry( brainGeometry );
 
-            var material = new THREE.MeshPhongMaterial( {
+            material = new THREE.MeshPhongMaterial( {
 		color: 0xffffff,
                 vertexColors: THREE.FaceColors,
                 side: THREE.DoubleSide} );
@@ -83,10 +83,11 @@ $(document).ready(function(){
     
         $.get('/getPlane', {alpha: alpha, theta: theta}, function(res){
                 console.log(res);
-                setClippingPlane(res.normal, res.normal_dist, res.offset_target);
+                setClippingPlane(res.normal, res.offset_target_dist, res.offset_target);
                 //$.each(res.Shapes, function(i, e){
 
                 //});
+		render();
         });
 
     });
@@ -94,6 +95,8 @@ $(document).ready(function(){
     function setClippingPlane(normal, dist, target){
         //alert('here')
         var offset;
+	console.log(dist)
+	console.log(target)
         if (facingCamera(normal, [target[0], target[1], target[2]])){
             normalVector = new THREE.Vector3(-normal[0], -normal[1], -normal[2]);
             normalDist = dist;
@@ -104,8 +107,9 @@ $(document).ready(function(){
     
         localPlane = new THREE.Plane(normalVector, normalDist);
         material.clippingPlanes = [localPlane];
+	console.log(localPlane);
     
-        return normalVector;
+        //return normalVector;
     }
 
     function facingCamera(normal, planeOrigin){

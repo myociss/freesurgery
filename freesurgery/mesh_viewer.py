@@ -1,5 +1,5 @@
 import os, json, pathfinder, random, math
-from numpy import matmul
+import numpy as np
 
 from flask import Flask
 from flask import render_template, send_from_directory, jsonify, request
@@ -33,11 +33,18 @@ def send_plane():
     plane_intersection=app.config['mesh'].slice(rotation=rotation)
     shapes = []
     for shape in plane_intersection:
-        vertices = [[v[i] - app.config['vertex_mids'][i] for i in range(3)] for v in shape.vertices()]
+        vertices = [[v[i] - app.config['vertex_offsets'][i] for i in range(3)] for v in shape.vertices()]
         color_label = app.config['color_map'][shape.label()]
-        shapes.push({'vertices': vertices, 'color_label': color_label})
-    normal = matmul(rotation)
-    return jsonify({'shapes': shapes, 'offset_target': app.config['offset_target'], 'normal': })
+        shapes.append({'vertices': vertices, 'color_label': color_label})
+
+    rotation_x=np.array([[1,0,0], [0,math.cos(rotation[0]),math.sin(rotation[0])], [0,-math.sin(rotation[0]),math.cos(rotation[0])]])
+
+    rotation_y=np.array([[math.cos(rotation[1]),0,math.sin(rotation[1])], [0,1,0], [-math.sin(rotation[1]),0,math.cos(rotation[1])]])
+    normal = (np.matmul(rotation_x, rotation_y))[2]
+
+    offset_target_dist = np.dot(normal, app.config['offset_target'])
+
+    return jsonify({'shapes': shapes, 'offset_target': app.config['offset_target'], 'normal': list(normal), 'offset_target_dist': offset_target_dist})
 
 def view_brain_mesh(mesh_file, color_map_file=None, paths_file=None):
     print('reading mesh file...')
