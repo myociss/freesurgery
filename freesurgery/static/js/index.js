@@ -1,7 +1,7 @@
 //alert('here');
 $(document).ready(function(){
 
-    var camera, scene, renderer, controls, geometry, material, mesh, localPlane;
+    var camera, scene, renderer, controls, geometry, material, mesh, localPlane, cuttingPlane;
 
     var cameraX = 400;
     var cameraY = 0;
@@ -55,14 +55,14 @@ $(document).ready(function(){
 
             $.each(res.faces, function(i, e){
                 var face = new THREE.Face3(e.vertices[0], e.vertices[1], e.vertices[2]);
-		face.color.set(res.color_map[e.label]);
+		        face.color.set(res.color_map[e.label]);
                 brainGeometry.faces.push(face);
             });
 	    brainGeometry.computeFaceNormals();
 	    geometry = new THREE.BufferGeometry().fromGeometry( brainGeometry );
 
             material = new THREE.MeshPhongMaterial( {
-		color: 0xffffff,
+		        color: 0xffffff,
                 vertexColors: THREE.FaceColors,
                 side: THREE.DoubleSide} );
 
@@ -82,12 +82,51 @@ $(document).ready(function(){
         var theta = $('#theta').val();
     
         $.get('/getPlane', {alpha: alpha, theta: theta}, function(res){
-                console.log(res);
-                setClippingPlane(res.normal, res.offset_target_dist, res.offset_target);
-                //$.each(res.Shapes, function(i, e){
+            //console.log(res);
+            var selectedObject = scene.getObjectByName('currentPlane');
+            scene.remove( selectedObject );
+            setClippingPlane(res.normal, res.offset_target_dist, res.offset_target);
+            cuttingPlane = new THREE.Geometry();
+            var counter = 0;
+            $.each(res.shapes, function(i, e){
+                var shape_vertices = e.vertices;
+                var v0 = shape_vertices[0];
+                var v1 = shape_vertices[1];
+                var v2 = shape_vertices[2];
 
-                //});
-		render();
+                cuttingPlane.vertices.push(new THREE.Vector3(v0[0], v0[1], v0[2]));
+                cuttingPlane.vertices.push(new THREE.Vector3(v1[0], v1[1], v1[2]));
+                cuttingPlane.vertices.push(new THREE.Vector3(v2[0], v2[1], v2[2]));
+
+                var face = new THREE.Face3(counter, counter + 1, counter + 2);
+                face.color.set(e.color_label);
+                cuttingPlane.faces.push(face);
+
+                counter+=3;
+
+                if(shape_vertices.length == 4){
+                    var v3 = shape_vertices[3];
+                    cuttingPlane.vertices.push(new THREE.Vector3(v0[0], v0[1], v0[2]));
+                    cuttingPlane.vertices.push(new THREE.Vector3(v3[0], v3[1], v3[2]));
+                    cuttingPlane.vertices.push(new THREE.Vector3(v2[0], v2[1], v2[2]));
+
+                    var face = new THREE.Face3(counter, counter + 1, counter + 2);
+                    face.color.set(e.color_label);
+                    cuttingPlane.faces.push(face);
+
+                    counter+=3;
+                }
+
+            });
+            var planeMaterial = new THREE.MeshPhongMaterial( {
+		        color: 0xffffff,
+                vertexColors: THREE.FaceColors,
+                side: THREE.DoubleSide} );
+
+            var crossSection = new THREE.Mesh( cuttingPlane, planeMaterial );
+            crossSection.name = 'currentPlane';
+            scene.add( crossSection );
+		    render();
         });
 
     });

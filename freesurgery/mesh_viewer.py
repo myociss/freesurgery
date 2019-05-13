@@ -29,6 +29,11 @@ def send_plane():
     alpha = int(request.args.get('alpha'))
     theta = int(request.args.get('theta'))
     rotation = [math.pi * alpha / len(app.config['plane_ids']), math.pi * theta / len(app.config['plane_ids'])]
+    rotation_x=np.array([[1,0,0], [0,math.cos(rotation[0]),math.sin(rotation[0])], [0,-math.sin(rotation[0]),math.cos(rotation[0])]])
+    rotation_y=np.array([[math.cos(rotation[1]),0,math.sin(rotation[1])], [0,1,0], [-math.sin(rotation[1]),0,math.cos(rotation[1])]])
+    normal = (np.matmul(rotation_x, rotation_y))[2]
+    
+    offset_target_dist = np.dot(normal, app.config['offset_target'])
 
     plane_intersection=app.config['mesh'].slice(rotation=rotation)
     shapes = []
@@ -37,12 +42,6 @@ def send_plane():
         color_label = app.config['color_map'][shape.label()]
         shapes.append({'vertices': vertices, 'color_label': color_label})
 
-    rotation_x=np.array([[1,0,0], [0,math.cos(rotation[0]),math.sin(rotation[0])], [0,-math.sin(rotation[0]),math.cos(rotation[0])]])
-
-    rotation_y=np.array([[math.cos(rotation[1]),0,math.sin(rotation[1])], [0,1,0], [-math.sin(rotation[1]),0,math.cos(rotation[1])]])
-    normal = (np.matmul(rotation_x, rotation_y))[2]
-
-    offset_target_dist = np.dot(normal, app.config['offset_target'])
 
     return jsonify({'shapes': shapes, 'offset_target': app.config['offset_target'], 'normal': list(normal), 'offset_target_dist': offset_target_dist})
 
