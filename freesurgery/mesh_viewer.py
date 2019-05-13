@@ -1,4 +1,5 @@
 import os, json, pathfinder, random, math
+from numpy import matmul
 
 from flask import Flask
 from flask import render_template, send_from_directory, jsonify, request
@@ -30,7 +31,13 @@ def send_plane():
     rotation = [math.pi * alpha / len(app.config['plane_ids']), math.pi * theta / len(app.config['plane_ids'])]
 
     plane_intersection=app.config['mesh'].slice(rotation=rotation)
-    return jsonify([{'vertices': shape.vertices(), 'color_label': app.config['color_map'][shape.label()]} for shape in plane_intersection])
+    shapes = []
+    for shape in plane_intersection:
+        vertices = [[v[i] - app.config['vertex_mids'][i] for i in range(3)] for v in shape.vertices()]
+        color_label = app.config['color_map'][shape.label()]
+        shapes.push({'vertices': vertices, 'color_label': color_label})
+    normal = matmul(rotation)
+    return jsonify({'shapes': shapes, 'offset_target': app.config['offset_target'], 'normal': })
 
 def view_brain_mesh(mesh_file, color_map_file=None, paths_file=None):
     print('reading mesh file...')
@@ -41,6 +48,7 @@ def view_brain_mesh(mesh_file, color_map_file=None, paths_file=None):
     vertex_maxs = [max(map(lambda vertex: vertex[i], json_mesh['vertices'])) for i in range(3)]
     vertex_mids = [(vertex_maxs[i] - vertex_mins[i]) / 2 for i in range(3)]
 
+    app.config['vertex_offsets'] = vertex_mids
     app.config['vertices'] = [[v[i] - vertex_mids[i] for i in range(3)] for v in json_mesh['vertices']]
 
     if color_map_file:
@@ -52,10 +60,12 @@ def view_brain_mesh(mesh_file, color_map_file=None, paths_file=None):
         r = lambda: random.randint(0, 255)
         for i in range(num_labels):
             color_map.append('#%02X%02X%02X' % (r(),r(),r()))
+
     app.config['color_map'] = color_map
     app.config['faces'] = json_mesh['faces']
     app.config['mesh']=load_pathfinder_mesh(json_mesh)
     app.config['mesh'].set_target([100, 100, 150])
+    app.config['offset_target'] = [100 - vertex_mids[0], 100 - vertex_mids[1], 150 - vertex_mids[2]]
 
     # this should not be hardcoded but read in from file
     app.config['plane_ids'] = [i for i in range(8)]

@@ -3,7 +3,7 @@ $(document).ready(function(){
 
     var camera, scene, renderer, controls, geometry, material, mesh, localPlane;
 
-    var cameraX = -400;
+    var cameraX = 400;
     var cameraY = 0;
     var cameraZ = 0;
     
@@ -83,8 +83,47 @@ $(document).ready(function(){
     
         $.get('/getPlane', {alpha: alpha, theta: theta}, function(res){
                 console.log(res);
+                setClippingPlane(res.normal, res.normal_dist, res.offset_target);
+                //$.each(res.Shapes, function(i, e){
+
+                //});
         });
 
     });
+
+    function setClippingPlane(normal, dist, target){
+        //alert('here')
+        var offset;
+        if (facingCamera(normal, [target[0], target[1], target[2]])){
+            normalVector = new THREE.Vector3(-normal[0], -normal[1], -normal[2]);
+            normalDist = dist;
+        } else {
+            normalVector = new THREE.Vector3(normal[0], normal[1], normal[2]);
+            normalDist = -dist;
+        }
+    
+        localPlane = new THREE.Plane(normalVector, normalDist);
+        material.clippingPlanes = [localPlane];
+    
+        return normalVector;
+    }
+
+    function facingCamera(normal, planeOrigin){
+        var endpointDiff = normal;
+        var endpointDot = (endpointDiff[0] * endpointDiff[0]) + 
+            (endpointDiff[1] * endpointDiff[1]) +
+            (endpointDiff[2] * endpointDiff[2]);
+    
+        var cameraDiff = [cameraX - planeOrigin[0], cameraY - planeOrigin[1], 
+            cameraZ - planeOrigin[2]];
+        var cameraDot = (normal[0] * cameraDiff[0]) + (normal[1] * cameraDiff[1]) +
+            (normal[2] * cameraDiff[2]);
+    
+        if (cameraDot * endpointDot < 0){
+            return false;
+        } else {
+            return true;
+        }
+    }
 
 });
