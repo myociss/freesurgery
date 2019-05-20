@@ -94,14 +94,17 @@ $(document).ready(function(){
                 var v1 = shape_vertices[1];
                 var v2 = shape_vertices[2];
 
+		//var colorConvert = convertHex(e.color_label);
+		//var color = new THREE.Color(colorConvert[0]/255, colorConvert[1]/255, colorConvert[2]/255);
+
                 cuttingPlane.vertices.push(new THREE.Vector3(v0[0], v0[1], v0[2]));
                 cuttingPlane.vertices.push(new THREE.Vector3(v1[0], v1[1], v1[2]));
                 cuttingPlane.vertices.push(new THREE.Vector3(v2[0], v2[1], v2[2]));
 
                 var face = new THREE.Face3(counter, counter+1, counter+2);
 		//this has some problems; some slices don't have color....
-		//also color label is out of range; probably fixable bc off by one
                 face.color.set(e.color_label);
+		//face.color.set(color);
                 cuttingPlane.faces.push(face);
 
                 counter+=3;
@@ -114,6 +117,7 @@ $(document).ready(function(){
 
                     var face = new THREE.Face3(counter, counter+1, counter+2);
                     face.color.set(e.color_label);
+		    //face.color.set(color);
                     cuttingPlane.faces.push(face);
 
                     counter+=3;
@@ -168,5 +172,24 @@ $(document).ready(function(){
             return true;
         }
     }
+
+function convertHex(hex){
+    hex = hex.replace('#','');
+    r = parseInt(hex.substring(0,2), 16);
+    g = parseInt(hex.substring(2,4), 16);
+    b = parseInt(hex.substring(4,6), 16);
+
+    //r_percentage = r/255;
+    //g_percentage = g/255;
+    //b_percentage = b/255;
+
+    random_one = Math.random();
+    random_two = Math.random();
+    if(random_one > 0.5){
+	return([r*random_two, g*random_two, b*random_two]);
+    } else{
+	return([r+((255-r)*random_two),g+((255-g)*random_two),b+((255-b)*random_two)]);
+    }
+}
 
 });
