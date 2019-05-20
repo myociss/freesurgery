@@ -55,7 +55,7 @@ $(document).ready(function(){
 
             $.each(res.faces, function(i, e){
                 var face = new THREE.Face3(e.vertices[0], e.vertices[1], e.vertices[2]);
-		        face.color.set(res.color_map[e.label]);
+		        face.color.set(res.color_map[e.label-1]);
                 brainGeometry.faces.push(face);
             });
 	    brainGeometry.computeFaceNormals();
@@ -89,7 +89,6 @@ $(document).ready(function(){
             cuttingPlane = new THREE.Geometry();
             var counter = 0;
             $.each(res.shapes, function(i, e){
-		console.log(e.color_label);
                 var shape_vertices = e.vertices;
                 var v0 = shape_vertices[0];
                 var v1 = shape_vertices[1];
@@ -100,6 +99,8 @@ $(document).ready(function(){
                 cuttingPlane.vertices.push(new THREE.Vector3(v2[0], v2[1], v2[2]));
 
                 var face = new THREE.Face3(counter, counter+1, counter+2);
+		//this has some problems; some slices don't have color....
+		//also color label is out of range; probably fixable bc off by one
                 face.color.set(e.color_label);
                 cuttingPlane.faces.push(face);
 
@@ -136,8 +137,6 @@ $(document).ready(function(){
     function setClippingPlane(normal, dist, target){
         //alert('here')
         var offset;
-	console.log(dist)
-	console.log(target)
         if (facingCamera(normal, [target[0], target[1], target[2]])){
             normalVector = new THREE.Vector3(-normal[0], -normal[1], -normal[2]);
             normalDist = dist;
@@ -148,7 +147,6 @@ $(document).ready(function(){
     
         localPlane = new THREE.Plane(normalVector, normalDist);
         material.clippingPlanes = [localPlane];
-	console.log(localPlane);
     
         //return normalVector;
     }

@@ -12,6 +12,7 @@ setup(name='freesurgery',
           'numpy',
           'flask',
           'meshio',
+          'nibabel',
           'nii2mesh',
       ],
       entry_points={

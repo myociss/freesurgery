@@ -39,13 +39,13 @@ def send_plane():
     shapes = []
     for shape in plane_intersection:
         vertices = [[v[i] - app.config['vertex_offsets'][i] for i in range(3)] for v in shape.vertices()]
-        color_label = app.config['color_map'][shape.label()]
+        color_label = app.config['color_map'][shape.label()-1]
         shapes.append({'vertices': vertices, 'color_label': color_label})
 
 
     return jsonify({'shapes': shapes, 'offset_target': app.config['offset_target'], 'normal': list(normal), 'offset_target_dist': offset_target_dist})
 
-def view_brain_mesh(mesh_file, color_map_file=None, paths_file=None):
+def view_brain_mesh(mesh_file, color_map_file, paths_file=None):
     print('reading mesh file...')
     with open(mesh_file, 'r') as f:
         json_mesh = json.load(f)
@@ -57,15 +57,8 @@ def view_brain_mesh(mesh_file, color_map_file=None, paths_file=None):
     app.config['vertex_offsets'] = vertex_mids
     app.config['vertices'] = [[v[i] - vertex_mids[i] for i in range(3)] for v in json_mesh['vertices']]
 
-    if color_map_file:
-        color_map = color_map_file
-    else:
-        labels = [tet['label'] for tet in json_mesh['tetrahedrons']]
-        num_labels = max(labels)
-        color_map = []
-        r = lambda: random.randint(0, 255)
-        for i in range(num_labels):
-            color_map.append('#%02X%02X%02X' % (r(),r(),r()))
+    with open(color_map_file, 'r') as f:
+        color_map = [line.strip() for line in f.readlines()]
 
     app.config['color_map'] = color_map
     app.config['faces'] = json_mesh['faces']
