@@ -1,4 +1,4 @@
-import meshio, json, pathfinder, os, nii2mesh, tempfile, random, nibabel, numpy as np
+import meshio, json, pathfinder, os, pygalmesh, tempfile, random, nibabel, numpy as np
 from pathlib import Path
 from ctypes import c_char, sizeof, c_wchar_p, create_string_buffer
  
@@ -17,7 +17,7 @@ def mri2mesh3d(subject_file, color_map_file=None, triangle_size='medium'):
 
 
 #read voxel file into binary + output color map
-def mri2mesh3d(subject_file, freesurfer_color_map=None, triangle_size='medium'):
+def mri2mesh3d(subject_file, triangle_size, freesurfer_color_map=None):
     stack = nibabel.load(subject_file)
     header = stack.header
     a = np.array(stack.dataobj)
@@ -76,8 +76,24 @@ def mri2mesh3d(subject_file, freesurfer_color_map=None, triangle_size='medium'):
 
 
     output_file_stem = Path(subject_file).stem.replace('.nii', '').replace('.gz', '')
-    nii2mesh.generate_mesh(path, output_file_stem + '.mesh', facet_distance=0.70, facet_size=2.0)
+    
+    #nii2mesh.generate_mesh(path, output_file_stem + '.mesh', facet_distance=0.70, facet_size=2.0)
+
+    if triangle_size=='small':
+        facet_size=2.0
+        facet_distance=0.70
+    elif triangle_size=='medium':
+        print('here')
+        facet_size=4.0
+        facet_distance=1.5
+    else:
+        facet_size=6.0
+        facet_distance=2.0
+  
+    mesh=pygalmesh.generate_from_inr(path, facet_angle=30.0, facet_size=facet_size, facet_distance=facet_distance, cell_radius_edge_ratio=3.0, cell_size=8.0)
     os.remove(path)
+
+    meshio.write(output_file_stem + '.mesh', mesh)
 
     if freesurfer_color_map:
         color_map = ['' for i in range(len(unique_labels))]

@@ -5,7 +5,7 @@ def check_parcellation():
     freesurgery.check_parcellation('')
 
 def mri2mesh3d():
-    freesurgery.mri2mesh3d(argv[1], argv[2])
+    freesurgery.mri2mesh3d(argv[1], argv[2], argv[3])
 
 def mesh2json():
     freesurgery.mesh2json(argv[1])

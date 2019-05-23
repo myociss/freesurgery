@@ -41,6 +41,8 @@ def send_plane():
         vertices = [[v[i] - app.config['vertex_offsets'][i] for i in range(3)] for v in shape.vertices()]
         color_label = app.config['color_map'][shape.label()-1]
         shapes.append({'vertices': vertices, 'color_label': color_label})
+    #with open('slice.json', 'w') as f:
+    #    json.dump({'shapes': shapes, 'offset_target': app.config['offset_target'], 'normal': list(normal), 'offset_target_dist': offset_target_dist}, f) 
 
 
     return jsonify({'shapes': shapes, 'offset_target': app.config['offset_target'], 'normal': list(normal), 'offset_target_dist': offset_target_dist})
