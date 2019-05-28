@@ -82,10 +82,6 @@ def mri2mesh3d(subject_file, triangle_size, freesurfer_color_map=None):
     if triangle_size=='small':
         facet_size=2.0
         facet_distance=0.70
-    elif triangle_size=='medium':
-        print('here')
-        facet_size=4.0
-        facet_distance=1.5
     else:
         facet_size=6.0
         facet_distance=2.0

@@ -36,16 +36,13 @@ def send_plane():
     offset_target_dist = np.dot(normal, app.config['offset_target'])
 
     plane_intersection=app.config['mesh'].slice(rotation=rotation)
-    shapes = []
-    for shape in plane_intersection:
-        vertices = [[v[i] - app.config['vertex_offsets'][i] for i in range(3)] for v in shape.vertices()]
-        color_label = app.config['color_map'][shape.label()-1]
-        shapes.append({'vertices': vertices, 'color_label': color_label})
-    #with open('slice.json', 'w') as f:
-    #    json.dump({'shapes': shapes, 'offset_target': app.config['offset_target'], 'normal': list(normal), 'offset_target_dist': offset_target_dist}, f) 
+    color_map=app.config['color_map']
+    offsets = np.array(app.config['vertex_offsets'])
 
+    shapes = [{'vertices': [list(v-offsets) for v in shape.vertices()], 'color_label': color_map[shape.label()-1]} for shape in plane_intersection]
 
     return jsonify({'shapes': shapes, 'offset_target': app.config['offset_target'], 'normal': list(normal), 'offset_target_dist': offset_target_dist})
+
 
 def view_brain_mesh(mesh_file, color_map_file, paths_file=None):
     print('reading mesh file...')
