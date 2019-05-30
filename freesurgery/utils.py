@@ -1,23 +1,10 @@
-import meshio, json, pathfinder, os, pygalmesh, tempfile, random, nibabel, numpy as np
+import meshio, json, pathfinder, os, pygalmesh, tempfile, random, nibabel, numpy as np, time, multiprocessing
 from pathlib import Path
-from ctypes import c_char, sizeof, c_wchar_p, create_string_buffer
- 
-def check_parcellation(parcellation_labels):
-    print('to do: add code to check if parcellation edges can be kept')
-
-'''
-def mri2mesh3d(subject_file, color_map_file=None, triangle_size='medium'):
-    fd, path = tempfile.mkstemp()
-    print('writing subject file to binary....')
-    #nii2mesh.nii2inr(subject_file, fd)
-    if nii2inr(subject_file, fd, color_map_file):
-        nii2mesh.generate_mesh(path, Path(subject_file).stem.replace('.nii', '').replace('.gz', '') + '.mesh', facet_distance=0.70, facet_size=2.0)
-    os.remove(path)
-'''
+from ctypes import c_char, create_string_buffer
 
 
 #read voxel file into binary + output color map
-def mri2mesh3d(subject_file, triangle_size, freesurfer_color_map=None):
+def mri2mesh3d(subject_file, triangle_size, freesurfer_color_map):
     stack = nibabel.load(subject_file)
     header = stack.header
     a = np.array(stack.dataobj)
@@ -26,7 +13,7 @@ def mri2mesh3d(subject_file, triangle_size, freesurfer_color_map=None):
     unique_labels.remove(0)
 
     if len(unique_labels) > 254:
-        print('error: this file contains more than 255 labels; label values must fit into one byte')
+        print('error: this file contains more than 255 labels; label values must fit into one byte. support for files with more labels may be added in future releases. email yocissms@gmail.com to request an update or open an issue at https://github.com/myociss/freesurgery/issues.')
         return
 
     label_dict = {unique_labels[i]: i+1 for i in range(len(unique_labels))}
@@ -77,7 +64,6 @@ def mri2mesh3d(subject_file, triangle_size, freesurfer_color_map=None):
 
     output_file_stem = Path(subject_file).stem.replace('.nii', '').replace('.gz', '')
     
-    #nii2mesh.generate_mesh(path, output_file_stem + '.mesh', facet_distance=0.70, facet_size=2.0)
 
     if triangle_size=='small':
         facet_size=2.0
@@ -108,14 +94,18 @@ def mri2mesh3d(subject_file, triangle_size, freesurfer_color_map=None):
             f.write(item + '\n')
 
 
-
-# need to include weight information
-def mesh2json(mesh_file):
+def mesh2json(mesh_file, weights_file):
     print('reading mesh file...')
     mesh = meshio.read(mesh_file)
 
     tets = [sorted(tet) for tet in mesh.cells['tetra']]
     tet_labels = [label.item() for label in mesh.cell_data['tetra']['medit:ref']]
+    
+    with open(weights_file, 'r') as f:
+        lines = f.readlines()
+        weights = [float(line.strip()) for line in lines]
+    
+    tet_weights = [weights[label-1] for label in tet_labels]
 
     vertices_json = [list([comp.item() for comp in p]) for p in mesh.points]
 
@@ -126,7 +116,7 @@ def mesh2json(mesh_file):
     print('converting tetrahedrons to json...')
     for idx, tet in enumerate(tets):
         tet = [v.item() for v in tet]
-        tets_json.append({'vertices': tet, 'neighbors':[], 'weight':random.random(), 'label': tet_labels[idx]})
+        tets_json.append({'vertices': tet, 'neighbors':[], 'weight':tet_weights[idx], 'label': tet_labels[idx]})
 
         for i in range(4):
             face = [tet[j] for j in range(4) if j != i]
@@ -148,5 +138,35 @@ def mesh2json(mesh_file):
     print('writing mesh to json file...')
     with open(Path(mesh_file).stem + '.json', 'w') as f:
         json.dump({'vertices': vertices_json,'tetrahedrons': tets_json, 'faces': faces_json}, f)
+
+
+def generate_paths(mesh_file, target, num_slices):
+    with open(mesh_file, 'r') as f:
+        json_mesh=json.load(f)
+    print(target)
+    print('reading file into pathfinder mesh...')
+    mesh=pathfinder.Mesh(num_vertices=len(json_mesh['vertices']), num_faces=len(json_mesh['faces']), num_tetrahedrons=len(json_mesh['tetrahedrons']))
+
+    mesh.set_vertices(json_mesh['vertices'])
+
+    for idx, tet in enumerate(json_mesh['tetrahedrons']):
+        mesh.add_tetrahedron(tetrahedron_id=idx, neighbor_ids=tet['neighbors'], vertex_ids=tet['vertices'], weight=tet['weight'], label=tet['label'])
+
+    for idx, face in enumerate(json_mesh['faces']):
+        mesh.add_face(vertex_ids=face['vertices'], tetrahedron_id=face['tetrahedron'])
+
+    
+    start=time.time()
+    if not mesh.set_target(target):
+        print('error: mesh does not contain the target specified')
+        return
+    end=time.time()
+    print('set mesh target in ' + str(end-start) + ' seconds')
+
+    start=time.time()
+    mesh.multiple_slices(epsilon=num_slices, threads=multiprocessing.cpu_count())
+    end=time.time()
+    print(end-start)
+
 
 

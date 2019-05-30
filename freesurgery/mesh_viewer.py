@@ -5,8 +5,6 @@ from flask import Flask
 from flask import render_template, send_from_directory, jsonify, request
 
 app = Flask('freesurgery')
-#json_mesh = None
-#mesh = None
 
 @app.route('/static/js/<path:path>')
 def send_js(path):
@@ -44,7 +42,7 @@ def send_plane():
     return jsonify({'shapes': shapes, 'offset_target': app.config['offset_target'], 'normal': list(normal), 'offset_target_dist': offset_target_dist})
 
 
-def view_brain_mesh(mesh_file, color_map_file, paths_file=None):
+def view_mesh(mesh_file, color_map_file, paths_file=None):
     print('reading mesh file...')
     with open(mesh_file, 'r') as f:
         json_mesh = json.load(f)

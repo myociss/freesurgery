@@ -1,2 +1,2 @@
-from .utils import check_parcellation, mri2mesh3d, mesh2json
-from .mesh_viewer import view_brain_mesh
+from .utils import mri2mesh3d, mesh2json, generate_paths
+from .mesh_viewer import view_mesh
