@@ -26,6 +26,18 @@ $(document).ready(function(){
         scene = new THREE.Scene();
     
         scene.background = new THREE.Color( 0xf0f0f0 );
+	/*var light = new THREE.DirectionalLight( 0xefefff, 1.0 );
+        light.position.set( 1, 1, 0 ).normalize();
+        scene.add( light );
+	var light = new THREE.DirectionalLight( 0xefefff, 1.0 );
+        light.position.set( -1, -1, 0 ).normalize();
+        scene.add( light );
+	var light = new THREE.DirectionalLight( 0xefefff, 1.0 );
+        light.position.set( -1, 1, 0 ).normalize();
+	var light = new THREE.DirectionalLight( 0xefefff, 1.0 );
+        light.position.set( 1, -1, 0 ).normalize();
+        scene.add( light );
+        scene.add( light );*/
         var light = new THREE.DirectionalLight( 0xefefff, 1.5 );
         light.position.set( 1, 1, 1 ).normalize();
         scene.add( light );
@@ -102,7 +114,7 @@ $(document).ready(function(){
                 cuttingPlane.vertices.push(new THREE.Vector3(v2[0], v2[1], v2[2]));
 
                 var face = new THREE.Face3(counter, counter+1, counter+2);
-		//this has some problems; some slices don't have color....
+
                 face.color.set(e.color_label);
 		//face.color.set(color);
                 cuttingPlane.faces.push(face);
@@ -125,12 +137,13 @@ $(document).ready(function(){
 
             });
 	    cuttingPlane.computeFaceNormals();
-            var planeMaterial = new THREE.MeshPhongMaterial( {
+            var planeMaterial = new THREE.MeshBasicMaterial( {
 		        color: 0xffffff,
                 vertexColors: THREE.FaceColors,
                 side: THREE.DoubleSide} );
 
             var crossSection = new THREE.Mesh( cuttingPlane, planeMaterial );
+	    //crossSection.rotation.x = Math.PI/2;
             crossSection.name = 'currentPlane';
             scene.add( crossSection );
 	    render();
