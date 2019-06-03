@@ -85,11 +85,10 @@ $(document).ready(function(){
             //console.log(res);
             var selectedObject = scene.getObjectByName('currentPlane');
             scene.remove( selectedObject );
-            setClippingPlane(res.normal, res.offset_target_dist, res.offset_target);
+            var normalOffset = setClippingPlane(res.normal, res.offset_target_dist, res.offset_target);
             cuttingPlane = new THREE.Geometry();
             var counter = 0;
 	    
-	    var pathOffset = res.normal;
 	    $.each(res.paths, function(i, e){
 		var v0 = e.pt0;
 		var v1 = e.pt1;
@@ -97,14 +96,14 @@ $(document).ready(function(){
 		console.log(v0);
 		console.log(v1);
 		
-		cuttingPlane.vertices.push(new THREE.Vector3(v0[0]+pathOffset[0], v0[1]+pathOffset[1], v0[2]+pathOffset[2]));
+		cuttingPlane.vertices.push(new THREE.Vector3(v0[0]-normalOffset.x, v0[1]-normalOffset.y, v0[2]-normalOffset.z));
 
-		cuttingPlane.vertices.push(new THREE.Vector3(v1[0]+pathOffset[0], v1[1]+pathOffset[1], v1[2]+pathOffset[2]));
+		cuttingPlane.vertices.push(new THREE.Vector3(v1[0]-normalOffset.x, v1[1]-normalOffset.y, v1[2]-normalOffset.z));
 
-		cuttingPlane.vertices.push(new THREE.Vector3(v2[0]+pathOffset[0], v2[1]+pathOffset[1], v2[2]+pathOffset[2]));
+		cuttingPlane.vertices.push(new THREE.Vector3(v2[0]-normalOffset.x, v2[1]-normalOffset.y, v2[2]-normalOffset.z));
 
 		var face = new THREE.Face3(counter, counter+1, counter+2);
-                face.color.setHex(0x00ffff);
+                face.color.setHex(0xff0000);
 
 		cuttingPlane.faces.push(face);
 
@@ -164,7 +163,7 @@ $(document).ready(function(){
     });
 
     function setClippingPlane(normal, dist, target){
-        var offset;
+        var normalVector;
         if (facingCamera(normal, [target[0], target[1], target[2]])){
             normalVector = new THREE.Vector3(-normal[0], -normal[1], -normal[2]);
             normalDist = dist;
@@ -175,6 +174,7 @@ $(document).ready(function(){
     
         localPlane = new THREE.Plane(normalVector, normalDist);
         material.clippingPlanes = [localPlane];
+	return normalVector;
     
     }
 
