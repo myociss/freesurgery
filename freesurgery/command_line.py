@@ -30,4 +30,4 @@ def generate_paths():
     freesurgery.generate_paths(argv[1], target, int(argv[3]))
 
 def view_mesh():
-    freesurgery.view_mesh(argv[1], argv[2])
+    freesurgery.view_mesh(argv[1], argv[2], argv[3])

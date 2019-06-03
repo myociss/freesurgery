@@ -1,4 +1,3 @@
-//alert('here');
 $(document).ready(function(){
 
     var camera, scene, renderer, controls, geometry, material, mesh, localPlane, cuttingPlane;
@@ -26,18 +25,7 @@ $(document).ready(function(){
         scene = new THREE.Scene();
     
         scene.background = new THREE.Color( 0xf0f0f0 );
-	/*var light = new THREE.DirectionalLight( 0xefefff, 1.0 );
-        light.position.set( 1, 1, 0 ).normalize();
-        scene.add( light );
-	var light = new THREE.DirectionalLight( 0xefefff, 1.0 );
-        light.position.set( -1, -1, 0 ).normalize();
-        scene.add( light );
-	var light = new THREE.DirectionalLight( 0xefefff, 1.0 );
-        light.position.set( -1, 1, 0 ).normalize();
-	var light = new THREE.DirectionalLight( 0xefefff, 1.0 );
-        light.position.set( 1, -1, 0 ).normalize();
-        scene.add( light );
-        scene.add( light );*/
+
         var light = new THREE.DirectionalLight( 0xefefff, 1.5 );
         light.position.set( 1, 1, 1 ).normalize();
         scene.add( light );
@@ -100,6 +88,30 @@ $(document).ready(function(){
             setClippingPlane(res.normal, res.offset_target_dist, res.offset_target);
             cuttingPlane = new THREE.Geometry();
             var counter = 0;
+	    
+	    var pathOffset = res.normal;
+	    $.each(res.paths, function(i, e){
+		var v0 = e.pt0;
+		var v1 = e.pt1;
+		var v2 = res.offset_target;
+		console.log(v0);
+		console.log(v1);
+		
+		cuttingPlane.vertices.push(new THREE.Vector3(v0[0]+pathOffset[0], v0[1]+pathOffset[1], v0[2]+pathOffset[2]));
+
+		cuttingPlane.vertices.push(new THREE.Vector3(v1[0]+pathOffset[0], v1[1]+pathOffset[1], v1[2]+pathOffset[2]));
+
+		cuttingPlane.vertices.push(new THREE.Vector3(v2[0]+pathOffset[0], v2[1]+pathOffset[1], v2[2]+pathOffset[2]));
+
+		var face = new THREE.Face3(counter, counter+1, counter+2);
+                face.color.setHex(0x00ffff);
+
+		cuttingPlane.faces.push(face);
+
+		counter += 3;
+
+	    });
+
             $.each(res.shapes, function(i, e){
                 var shape_vertices = e.vertices;
                 var v0 = shape_vertices[0];
@@ -152,7 +164,6 @@ $(document).ready(function(){
     });
 
     function setClippingPlane(normal, dist, target){
-        //alert('here')
         var offset;
         if (facingCamera(normal, [target[0], target[1], target[2]])){
             normalVector = new THREE.Vector3(-normal[0], -normal[1], -normal[2]);
@@ -165,7 +176,6 @@ $(document).ready(function(){
         localPlane = new THREE.Plane(normalVector, normalDist);
         material.clippingPlanes = [localPlane];
     
-        //return normalVector;
     }
 
     function facingCamera(normal, planeOrigin){

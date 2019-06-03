@@ -22,6 +22,7 @@ def mesh_view():
 def send_mesh():
     return jsonify({'vertices': app.config['vertices'], 'faces': app.config['faces'], 'color_map': app.config['color_map']})
 
+
 @app.route('/getPlane')
 def send_plane():
     alpha = int(request.args.get('alpha'))
@@ -39,10 +40,12 @@ def send_plane():
 
     shapes = [{'vertices': [list(v-offsets) for v in shape.vertices()], 'color_label': color_map[shape.label()-1]} for shape in plane_intersection]
 
-    return jsonify({'shapes': shapes, 'offset_target': app.config['offset_target'], 'normal': list(normal), 'offset_target_dist': offset_target_dist})
+    #print(app.config['paths'][alpha*len(app.config['plane_ids']) + theta])
+
+    return jsonify({'shapes': shapes, 'paths': app.config['paths'][alpha*len(app.config['plane_ids']) + theta], 'offset_target': app.config['offset_target'], 'normal': list(normal), 'offset_target_dist': offset_target_dist})
 
 
-def view_mesh(mesh_file, color_map_file, paths_file=None):
+def view_mesh(mesh_file, color_map_file, paths_file):
     print('reading mesh file...')
     with open(mesh_file, 'r') as f:
         json_mesh = json.load(f)
@@ -60,11 +63,31 @@ def view_mesh(mesh_file, color_map_file, paths_file=None):
     app.config['color_map'] = color_map
     app.config['faces'] = json_mesh['faces']
     app.config['mesh']=load_pathfinder_mesh(json_mesh)
-    app.config['mesh'].set_target([100, 100, 150])
-    app.config['offset_target'] = [100 - vertex_mids[0], 100 - vertex_mids[1], 150 - vertex_mids[2]]
 
-    # this should not be hardcoded but read in from file
-    app.config['plane_ids'] = [i for i in range(8)]
+    print('reading paths file...')
+    with open(paths_file, 'r') as f:
+        json_paths = json.load(f)
+
+    target=json_paths['target']
+    app.config['mesh'].set_target(target)
+    app.config['offset_target'] = [target[0] - vertex_mids[0], target[1] - vertex_mids[1], target[2] - vertex_mids[2]]
+
+    num_slices=json_paths['num_slices']
+    app.config['plane_ids']=[i for i in range(num_slices)]
+
+    paths=[[] for i in range(num_slices*num_slices)]
+    offsets = np.array(app.config['vertex_offsets'])
+
+    for path in json_paths['paths']:
+        plane_id=path['alpha_id'] * num_slices + path['theta_id']
+        view_path={'pt0': list(path['point_0']-offsets), 'pt1': list(path['point_1']-offsets)}
+        paths[plane_id].append(view_path)
+
+    for plane_id, path_group in enumerate(paths):
+        if len(path_group) > 0:
+            print(f'{len(path_group)} paths in plane ({plane_id//num_slices}, {plane_id%num_slices})')
+
+    app.config['paths']=paths
 
     os.environ['FLASK_ENV'] = 'development'
     app.run()

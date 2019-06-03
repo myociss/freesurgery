@@ -43,7 +43,7 @@ def mri2mesh3d(subject_file, triangle_size, freesurfer_color_map):
     data = []
 
     for i in range(x_dim):
-        print('writing slice ' + str(i+1) + ' of ' + str(x_dim))
+        print(f'writing slice {i+1} of {x_dim}')
         for j in range(y_dim):
             for k in range(z_dim):
                  if a[i,j,k].item()==0:
@@ -161,12 +161,22 @@ def generate_paths(mesh_file, target, num_slices):
         print('error: mesh does not contain the target specified')
         return
     end=time.time()
-    print('set mesh target in ' + str(end-start) + ' seconds')
+    print(f'set mesh target in {end-start} seconds')
 
     start=time.time()
-    mesh.multiple_slices(epsilon=num_slices, threads=multiprocessing.cpu_count())
+    paths=mesh.get_paths(epsilon=num_slices, threads=multiprocessing.cpu_count(), distance_bound=0.0)
     end=time.time()
-    print(end-start)
+    print(f'found {len(paths)} paths in {end-start} seconds')
+    print('writing paths to file...')
+    output_paths=[]
+    for path in paths:
+        plane_id=path.plane_id()
+        theta_id=plane_id%8
+        alpha_id=plane_id//8
+        output_paths.append({'alpha_id': alpha_id, 'theta_id': theta_id, 'point_0': list(path.points()[0]), 'point_1': list(path.points()[1]), 'upper_bound': path.upper_bound(), 'lower_bound': path.lower_bound()})
+
+    with open(Path(mesh_file).stem + '_paths.json', 'w') as f:
+        json.dump({'target': target, 'num_slices': num_slices, 'paths': output_paths}, f)
 
 
 
