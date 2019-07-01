@@ -27,7 +27,7 @@ def generate_paths():
         print('target argument requires 3 numeric values separated by a comma')
         return
 
-    freesurgery.generate_paths(argv[1], target, int(argv[3]))
+    freesurgery.generate_paths(argv[1], target, int(argv[3]), float(argv[4]))
 
 def view_mesh():
     freesurgery.view_mesh(argv[1], argv[2], argv[3])

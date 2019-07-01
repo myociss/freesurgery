@@ -140,7 +140,7 @@ def mesh2json(mesh_file, weights_file):
         json.dump({'vertices': vertices_json,'tetrahedrons': tets_json, 'faces': faces_json}, f)
 
 
-def generate_paths(mesh_file, target, num_slices):
+def generate_paths(mesh_file, target, num_slices, width_bound):
     with open(mesh_file, 'r') as f:
         json_mesh=json.load(f)
     print(target)
@@ -164,7 +164,7 @@ def generate_paths(mesh_file, target, num_slices):
     print(f'set mesh target in {end-start} seconds')
 
     start=time.time()
-    paths=mesh.get_paths(epsilon=num_slices, threads=multiprocessing.cpu_count(), distance_bound=0.0)
+    paths=mesh.get_paths(search_planes=num_slices, threads=multiprocessing.cpu_count(), width_bound=width_bound)
     end=time.time()
     print(f'found {len(paths)} paths in {end-start} seconds')
     print('writing paths to file...')

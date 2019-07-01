@@ -93,8 +93,8 @@ $(document).ready(function(){
 		var v0 = e.pt0;
 		var v1 = e.pt1;
 		var v2 = res.offset_target;
-		console.log(v0);
-		console.log(v1);
+		//console.log(v0);
+		//console.log(v1);
 		
 		cuttingPlane.vertices.push(new THREE.Vector3(v0[0]-normalOffset.x, v0[1]-normalOffset.y, v0[2]-normalOffset.z));
 
