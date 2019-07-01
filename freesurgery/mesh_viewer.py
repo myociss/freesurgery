@@ -73,6 +73,7 @@ def view_mesh(mesh_file, color_map_file, paths_file):
     app.config['offset_target'] = [target[0] - vertex_mids[0], target[1] - vertex_mids[1], target[2] - vertex_mids[2]]
 
     num_slices=json_paths['num_slices']
+    #check [100,100,150] at 2, 0
     app.config['plane_ids']=[i for i in range(num_slices)]
 
     paths=[[] for i in range(num_slices*num_slices)]

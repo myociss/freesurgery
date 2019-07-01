@@ -18,6 +18,24 @@ def mri2mesh3d(subject_file, triangle_size, freesurfer_color_map):
 
     label_dict = {unique_labels[i]: i+1 for i in range(len(unique_labels))}
 
+    output_file_stem = Path(subject_file).stem.replace('.nii', '').replace('.gz', '')
+
+    if freesurfer_color_map:
+        color_map = ['' for i in range(len(unique_labels))]
+        with open(freesurfer_color_map, 'r') as f:
+            lines = f.readlines()
+        for line in lines:
+            row = [x.strip() for x in line.split()]
+            if len(row) == 6 and row[0].isdigit() and int(row[0]) != 0 and int(row[0]) in label_dict:
+                color_map[label_dict[int(row[0])]-1] = '#%02X%02X%02X' % (int(row[2]),int(row[3]),int(row[4]))
+    else:
+        r = lambda: random.randint(0, 255)
+        color_map=['#%02X%02X%02X' % (r(),r(),r()) for i in range(len(unique_labels))]
+
+    with open(output_file_stem + '_colors.txt', 'w') as f:
+        for item in color_map:
+            f.write(item + '\n')
+
     x_dim = a.shape[0]
     y_dim = a.shape[1]
     z_dim = a.shape[2]
@@ -60,9 +78,6 @@ def mri2mesh3d(subject_file, triangle_size, freesurfer_color_map):
         tmp.write(c_str.raw)
         for char in data:
             tmp.write(char)
-
-
-    output_file_stem = Path(subject_file).stem.replace('.nii', '').replace('.gz', '')
     
 
     if triangle_size=='small':
@@ -76,22 +91,6 @@ def mri2mesh3d(subject_file, triangle_size, freesurfer_color_map):
     os.remove(path)
 
     meshio.write(output_file_stem + '.mesh', mesh)
-
-    if freesurfer_color_map:
-        color_map = ['' for i in range(len(unique_labels))]
-        with open(freesurfer_color_map, 'r') as f:
-            lines = f.readlines()
-        for line in lines:
-            row = [x.strip() for x in line.split()]
-            if len(row) == 6 and row[0].isdigit() and int(row[0]) != 0 and int(row[0]) in label_dict:
-                color_map[label_dict[int(row[0])]-1] = '#%02X%02X%02X' % (int(row[2]),int(row[3]),int(row[4]))
-    else:
-        r = lambda: random.randint(0, 255)
-        color_map=['#%02X%02X%02X' % (r(),r(),r()) for i in range(len(unique_labels))]
-
-    with open(output_file_stem + '_colors.txt', 'w') as f:
-        for item in color_map:
-            f.write(item + '\n')
 
 
 def mesh2json(mesh_file, weights_file):

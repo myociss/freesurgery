@@ -2,8 +2,8 @@ $(document).ready(function(){
 
     var camera, scene, renderer, controls, geometry, material, mesh, localPlane, cuttingPlane;
 
-    var cameraX = 400;
-    var cameraY = 0;
+    var cameraX = 0;
+    var cameraY = -300;
     var cameraZ = 0;
     
     initScene();
@@ -80,6 +80,14 @@ $(document).ready(function(){
     $('body').on('click', '.plane-bttn', function(){
         var alpha = $('#alpha').val();
         var theta = $('#theta').val();
+
+	$('#loading .modal-body').text('Retrieving slice...');
+
+	$('#loading').modal({
+            backdrop: "static",
+            keyboard: false,
+            show: true
+    	});
     
         $.get('/getPlane', {alpha: alpha, theta: theta}, function(res){
             //console.log(res);
@@ -157,6 +165,7 @@ $(document).ready(function(){
 	    //crossSection.rotation.x = Math.PI/2;
             crossSection.name = 'currentPlane';
             scene.add( crossSection );
+	    $('#loading').modal('hide');
 	    render();
         });
 
