@@ -4,34 +4,54 @@ Computer-assisted brain surgery planning
 
 ## Getting Started
 
-If you are a Windows user, you can use FreeSurgery inside a virtual machine. Support for Windows may be available in future releases.
-
 ### Prerequisites
 
-* Python 3
-* Eigen
-    ```
-    sudo apt-get install libeigen3-dev
-    ```
-* CGAL>=4.13
-    ```
-    sudo apt-get install libcgal-dev=4.13-1ubuntu3
-    ```
-* Install pathfinder
-    ```
-    git clone https://github.com/myociss/pathfinder
-    pip install ./pathfinder
-    ```
+Python 3, git, pip3.
 
-### Installing
+### Dependencies
+
+Follow instructions to install [pathfinder](https://github.com/myociss/pathfinder).
+
+Install CGAL.
+```
+sudo install libcgal-dev
+```
+
+### Installation
 
 ```
 git clone https://github.com/myociss/freesurgery
-pip install ./freesurgery
+pip3 install ./freesurgery
 ```
 
-### Subject File Conversion
-If  your subject files are not in NIFTI format, convert them to NIFTI using FreeSurfer's mri_convert utility. Example:
+## Usage
+
+To obtain a mesh and color map from a subject file: freesurgery_mri2mesh3d subject_file.nii facet_size
+
 ```
-mri_convert sample-001.mgz sample-001.nii.gz
+freesurgery_mri2mesh3d aparc_aseg.nii.gz small
+```
+
+To obtain a mesh from a subject file using FreeSurfer's color lookup table:
+
+```
+$ freesurgery_mri2mesh3d aparc_aseg.nii.gz small $FREESURFER_HOME/FreeSurferColorLUT.txt
+```
+
+To assign weights to a mesh and convert it to pathfinder's expected format: freesurgery_mesh2json mesh_file.mesh weights_file.txt
+
+```
+freesurgery_mesh2json aparc_aseg.mesh weights.txt
+```
+
+To generate a list of paths: freesurgery_generate_paths mesh_json.json target planes_to_search width_bound
+
+```
+freesurgery_generate_paths aparc_aseg.json “100,100,150” 16 0.01
+```
+
+To view a mesh with paths: freesurgery_view_mesh mesh_json.json color_map.txt paths.json
+
+```
+freesurgery_view_mesh aparc_aseg.json aparc_aseg_colors.txt aparc_aseg_paths.json
 ```
