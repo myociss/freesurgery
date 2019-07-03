@@ -81,8 +81,12 @@ def view_mesh(mesh_file, color_map_file, paths_file):
 
     for path in json_paths['paths']:
         plane_id=path['alpha_id'] * num_slices + path['theta_id']
-        view_path={'pt0': list(path['point_0']-offsets), 'pt1': list(path['point_1']-offsets)}
-        paths[plane_id].append(view_path)
+        #view_path={'pt0': list(path['point_0']-offsets), 'pt1': list(path['point_1']-offsets)}
+        pt0 = list(path['point_0']-offsets)
+        pt1 = list(path['point_1']-offsets)
+        midpt = [ (pt0[0] + pt1[0])/2, (pt0[1] + pt1[1])/2, (pt0[2] + pt1[2])/2 ]
+        #paths[plane_id].append(view_path)
+        paths[plane_id].append(midpt)
 
     for plane_id, path_group in enumerate(paths):
         if len(path_group) > 0:

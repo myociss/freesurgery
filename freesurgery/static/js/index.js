@@ -1,6 +1,6 @@
 $(document).ready(function(){
 
-    var camera, scene, renderer, controls, geometry, material, mesh, localPlane, cuttingPlane;
+    var camera, scene, renderer, controls, geometry, material, mesh, localPlane, cuttingPlane, paths;
 
     var cameraX = 0;
     var cameraY = -300;
@@ -93,16 +93,31 @@ $(document).ready(function(){
             //console.log(res);
             var selectedObject = scene.getObjectByName('currentPlane');
             scene.remove( selectedObject );
+            var selectedObject = scene.getObjectByName('currentPaths');
+            scene.remove( selectedObject );
+
             var normalOffset = setClippingPlane(res.normal, res.offset_target_dist, res.offset_target);
+
             cuttingPlane = new THREE.Geometry();
+	    paths = new THREE.Geometry();
+
+	    $.each(res.paths, function(i, e){
+		paths.vertices.push(new THREE.Vector3(e[0]-normalOffset.x, e[1]-normalOffset.y, e[2]-normalOffset.z));
+		paths.vertices.push(new THREE.Vector3(res.offset_target[0]-normalOffset.x, res.offset_target[1]-normalOffset.y, res.offset_target[2]-normalOffset.z));
+
+	    });
+
+	    var lineMaterial = new THREE.LineBasicMaterial( {color: 0xff0000} );
+	    var pathMesh = new THREE.Line(paths, lineMaterial);
+	    pathMesh.name = 'currentPaths';
+	    scene.add(pathMesh);
+
             var counter = 0;
 	    
-	    $.each(res.paths, function(i, e){
+	    /*$.each(res.paths, function(i, e){
 		var v0 = e.pt0;
 		var v1 = e.pt1;
 		var v2 = res.offset_target;
-		//console.log(v0);
-		//console.log(v1);
 		
 		cuttingPlane.vertices.push(new THREE.Vector3(v0[0]-normalOffset.x, v0[1]-normalOffset.y, v0[2]-normalOffset.z));
 
@@ -117,7 +132,7 @@ $(document).ready(function(){
 
 		counter += 3;
 
-	    });
+	    });*/
 
             $.each(res.shapes, function(i, e){
                 var shape_vertices = e.vertices;
